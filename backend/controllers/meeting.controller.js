@@ -586,17 +586,23 @@ const confirmPayment = asyncHandler(async (req, res) => {
   const TeacherBalance = (await import('../models/teacherBalance.model.js')).default;
   const { Notification } = await import('../models/notification.model.js');
 
-  // Check if payment record already exists (from old system or pre-created)
+  // Check if payment record already exists (by meeting or by transaction ID)
   let studentPayment = await Payment.findOne({
-    user: meeting.studentId._id,
-    purposeId: meeting._id,
-    purpose: 'meeting'
+    $or: [
+      { user: meeting.studentId._id, purposeId: meeting._id, purpose: 'meeting' },
+      { transactionId: meeting.paymentProof }
+    ]
   });
 
   if (studentPayment) {
     // Update existing payment record
+    console.log('✅ Found existing payment record, updating...');
     studentPayment.status = 'success';
     studentPayment.esewaRefId = meeting.paymentProof;
+    studentPayment.user = meeting.studentId._id;
+    studentPayment.purposeId = meeting._id;
+    studentPayment.purpose = 'meeting';
+    studentPayment.amount = meeting.price;
     studentPayment.metadata = {
       ...studentPayment.metadata,
       meetingId: meeting._id,
@@ -607,24 +613,57 @@ const confirmPayment = asyncHandler(async (req, res) => {
     await studentPayment.save();
     console.log('✅ Updated existing payment record');
   } else {
-    // Create new payment record
-    studentPayment = await Payment.create({
-      transactionId: meeting.paymentProof || `MEETING-${meeting._id}-${Date.now()}`,
-      user: meeting.studentId._id,
-      amount: meeting.price,
-      purpose: 'meeting',
-      purposeId: meeting._id,
-      status: 'success',
-      paymentMethod: 'esewa',
-      esewaRefId: meeting.paymentProof,
-      metadata: {
-        meetingId: meeting._id,
-        teacherId: meeting.teacherId._id,
-        subject: meeting.subject,
-        confirmedAt: new Date()
+    // Create new payment record with unique transaction ID
+    const transactionId = meeting.paymentProof || `MEETING-${meeting._id}-${Date.now()}`;
+    
+    console.log('✅ Creating new payment record with transaction ID:', transactionId);
+    
+    try {
+      studentPayment = await Payment.create({
+        transactionId: transactionId,
+        user: meeting.studentId._id,
+        amount: meeting.price,
+        purpose: 'meeting',
+        purposeId: meeting._id,
+        status: 'success',
+        paymentMethod: 'esewa',
+        esewaRefId: meeting.paymentProof,
+        metadata: {
+          meetingId: meeting._id,
+          teacherId: meeting.teacherId._id,
+          subject: meeting.subject,
+          confirmedAt: new Date()
+        }
+      });
+      console.log('✅ Created new payment record');
+    } catch (error) {
+      // If duplicate key error, try to find and update the existing record
+      if (error.code === 11000) {
+        console.log('⚠️ Duplicate transaction ID detected, finding existing payment...');
+        studentPayment = await Payment.findOne({ transactionId: transactionId });
+        if (studentPayment) {
+          studentPayment.status = 'success';
+          studentPayment.user = meeting.studentId._id;
+          studentPayment.purposeId = meeting._id;
+          studentPayment.purpose = 'meeting';
+          studentPayment.amount = meeting.price;
+          studentPayment.esewaRefId = meeting.paymentProof;
+          studentPayment.metadata = {
+            ...studentPayment.metadata,
+            meetingId: meeting._id,
+            teacherId: meeting.teacherId._id,
+            subject: meeting.subject,
+            confirmedAt: new Date()
+          };
+          await studentPayment.save();
+          console.log('✅ Updated existing payment record after duplicate error');
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
       }
-    });
-    console.log('✅ Created new payment record');
+    }
   }
 
   // Get or create teacher balance

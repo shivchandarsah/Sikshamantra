@@ -43,7 +43,7 @@ Be helpful, concise, and friendly. Provide step-by-step instructions when needed
   }
 
   // Get response from Google Gemini
-  async getGeminiResponse(userMessage, conversationHistory = []) {
+  async getGeminiResponse(userMessage, conversationHistory = [], options = {}) {
     this._ensureInitialized();
     
     try {
@@ -54,7 +54,12 @@ Be helpful, concise, and friendly. Provide step-by-step instructions when needed
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`;
       
       // Build conversation context
-      let prompt = this.systemContext + '\n\n';
+      let prompt = '';
+      
+      // Add system context only if not disabled (for chatbot use)
+      if (options.useSystemContext !== false) {
+        prompt = this.systemContext + '\n\n';
+      }
       
       // Add conversation history
       if (conversationHistory.length > 0) {
@@ -65,7 +70,12 @@ Be helpful, concise, and friendly. Provide step-by-step instructions when needed
         prompt += '\n';
       }
       
-      prompt += `User: ${userMessage}\nAssistant:`;
+      // Add user message (with or without prefix based on context)
+      if (options.useSystemContext !== false) {
+        prompt += `User: ${userMessage}\nAssistant:`;
+      } else {
+        prompt += userMessage;
+      }
 
       const response = await axios.post(url, {
         contents: [{
@@ -74,10 +84,10 @@ Be helpful, concise, and friendly. Provide step-by-step instructions when needed
           }]
         }],
         generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
-          topP: 0.8,
-          topK: 40
+          temperature: options.temperature || 0.7,
+          maxOutputTokens: options.maxOutputTokens || 500,
+          topP: options.topP || 0.8,
+          topK: options.topK || 40
         }
       });
 
@@ -89,11 +99,11 @@ Be helpful, concise, and friendly. Provide step-by-step instructions when needed
   }
 
   // Main method to get AI response
-  async getResponse(userMessage, conversationHistory = []) {
+  async getResponse(userMessage, conversationHistory = [], options = {}) {
     this._ensureInitialized();
     
     try {
-      return await this.getGeminiResponse(userMessage, conversationHistory);
+      return await this.getGeminiResponse(userMessage, conversationHistory, options);
     } catch (error) {
       console.error('AI Service Error:', error.message);
       // Fallback to basic response

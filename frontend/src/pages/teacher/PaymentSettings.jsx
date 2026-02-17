@@ -49,6 +49,26 @@ export default function PaymentSettings() {
     }
   }, [user, initialized]);
 
+  // Re-sync when user data changes (e.g., after save)
+  useEffect(() => {
+    if (user && initialized) {
+      const userEsewaId = user.esewaId || "";
+      const userQrCode = user.esewaQRCode || "";
+      
+      console.log('🔄 Checking for user data changes:', {
+        userEsewaId,
+        currentEsewaId: esewaId,
+        userQrCode: userQrCode ? 'exists' : 'none',
+        currentQrCode: qrCodePreview ? 'exists' : 'none'
+      });
+      
+      // Update state with user data
+      setEsewaId(userEsewaId);
+      setQrCodePreview(userQrCode);
+      setHasPaymentDetails(!!(userEsewaId || userQrCode));
+    }
+  }, [user?.esewaId, user?.esewaQRCode, initialized]);
+
   const handleQRCodeChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -100,29 +120,36 @@ export default function PaymentSettings() {
       const response = await axiosInstance.put('/users/profile', payload);
 
       console.log('✅ Payment details saved:', response.data);
-      toast.success("Payment details updated successfully!");
-      
-      // Get the saved values from response
-      const finalEsewaId = response.data?.data?.esewaId || esewaId;
-      const finalQrCode = response.data?.data?.esewaQRCode || qrCodePreview;
-      
-      // Update all state
-      setEsewaId(finalEsewaId);
-      setQrCodePreview(finalQrCode);
-      setHasPaymentDetails(true);
-      setEditing(false);
-      
-      console.log('💾 Payment details updated in state');
       
       // Refresh user data to ensure context is updated
       if (auth?.refreshUser) {
-        auth.refreshUser().then(updatedUser => {
-          console.log('🔄 User context refreshed:', {
-            hasEsewaId: !!updatedUser?.esewaId,
-            hasQRCode: !!updatedUser?.esewaQRCode
-          });
+        console.log('🔄 Refreshing user context...');
+        const updatedUser = await auth.refreshUser();
+        console.log('✅ User context refreshed:', {
+          hasEsewaId: !!updatedUser?.esewaId,
+          hasQRCode: !!updatedUser?.esewaQRCode,
+          esewaId: updatedUser?.esewaId,
+          qrCodeLength: updatedUser?.esewaQRCode?.length
         });
       }
+      
+      // Update local state immediately (will be synced by useEffect)
+      const savedEsewaId = response.data?.data?.esewaId || esewaId;
+      const savedQrCode = response.data?.data?.esewaQRCode || qrCodePreview;
+      
+      console.log('💾 Updating local state:', {
+        savedEsewaId,
+        hasSavedQrCode: !!savedQrCode
+      });
+      
+      setEsewaId(savedEsewaId);
+      setQrCodePreview(savedQrCode);
+      setHasPaymentDetails(!!(savedEsewaId || savedQrCode));
+      setEditing(false);
+      setQrCodeFile(null);
+      
+      toast.success("Payment details updated successfully!");
+      console.log('✅ Payment details updated in state');
     } catch (error) {
       console.error('❌ Error updating payment details:', error);
       console.error('Error response:', error.response?.data);

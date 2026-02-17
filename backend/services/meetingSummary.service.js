@@ -17,8 +17,14 @@ class MeetingSummaryService {
       
       console.log('📝 Prompt built, sending to AI service...');
       
-      // Get AI response
-      const aiResponse = await aiService.getResponse(prompt);
+      // Get AI response WITHOUT system context (for summary generation)
+      const aiResponse = await aiService.getResponse(prompt, [], {
+        useSystemContext: false,  // Don't use chatbot system context
+        temperature: 0.5,          // Lower temperature for more consistent formatting
+        maxOutputTokens: 2000,     // Higher limit for detailed summaries
+        topP: 0.9,
+        topK: 40
+      });
       
       console.log('✅ AI response received, length:', aiResponse?.length || 0);
       
@@ -42,35 +48,53 @@ class MeetingSummaryService {
   buildSummaryPrompt(meetingData) {
     const { duration, chatMessages, whiteboardContent, participants, teacher, subject } = meetingData;
     
-    let prompt = `Generate a comprehensive summary of an online class with the following details:\n\n`;
+    let prompt = `You are an educational assistant. Generate a comprehensive summary of an online class.\n\n`;
     
-    prompt += `**Class Information:**\n`;
+    prompt += `CLASS INFORMATION:\n`;
+    prompt += `- Subject: ${subject || 'General'}\n`;
     prompt += `- Duration: ${duration} minutes\n`;
     prompt += `- Teacher: ${teacher}\n`;
-    prompt += `- Number of Students: ${participants.length}\n`;
-    if (subject) prompt += `- Subject: ${subject}\n`;
-    prompt += `\n`;
+    prompt += `- Number of Students: ${participants?.length || 1}\n\n`;
     
     if (chatMessages && chatMessages.length > 0) {
-      prompt += `**Chat Messages (${chatMessages.length} messages):**\n`;
-      chatMessages.forEach(msg => {
+      prompt += `CHAT MESSAGES (${chatMessages.length} messages):\n`;
+      chatMessages.slice(0, 20).forEach(msg => {  // Limit to first 20 messages
         prompt += `- ${msg.sender}: ${msg.message}\n`;
       });
       prompt += `\n`;
     }
     
     if (whiteboardContent) {
-      prompt += `**Whiteboard Content:**\n${whiteboardContent}\n\n`;
+      prompt += `WHITEBOARD CONTENT:\n${whiteboardContent}\n\n`;
     }
     
-    prompt += `Please provide a structured summary in the following format:\n\n`;
-    prompt += `1. **Summary**: Brief overview of the class (2-3 sentences)\n`;
-    prompt += `2. **Key Topics**: List 3-5 main topics covered\n`;
-    prompt += `3. **Important Points**: List 5-7 key learning points\n`;
-    prompt += `4. **Discussion Highlights**: Notable questions or discussions\n`;
-    prompt += `5. **Action Items**: Homework or tasks for students\n`;
-    prompt += `6. **Recommendations**: Study tips or next steps\n\n`;
-    prompt += `Format the response clearly with bullet points and sections.`;
+    prompt += `Please provide a structured summary in EXACTLY this format:\n\n`;
+    prompt += `1. Summary:\n`;
+    prompt += `[Write 2-3 sentences summarizing the class]\n\n`;
+    
+    prompt += `2. Key Topics:\n`;
+    prompt += `- [Topic 1]\n`;
+    prompt += `- [Topic 2]\n`;
+    prompt += `- [Topic 3]\n\n`;
+    
+    prompt += `3. Important Points:\n`;
+    prompt += `- [Point 1]\n`;
+    prompt += `- [Point 2]\n`;
+    prompt += `- [Point 3]\n\n`;
+    
+    prompt += `4. Discussion Highlights:\n`;
+    prompt += `- [Highlight 1]\n`;
+    prompt += `- [Highlight 2]\n\n`;
+    
+    prompt += `5. Action Items:\n`;
+    prompt += `- [Task 1]\n`;
+    prompt += `- [Task 2]\n\n`;
+    
+    prompt += `6. Recommendations:\n`;
+    prompt += `- [Recommendation 1]\n`;
+    prompt += `- [Recommendation 2]\n\n`;
+    
+    prompt += `IMPORTANT: Follow the exact format above with numbered sections and bullet points. Be specific and educational.`;
     
     return prompt;
   }
@@ -87,50 +111,81 @@ class MeetingSummaryService {
     };
 
     try {
-      // Split response into sections
-      const sections = aiResponse.split(/\*\*|\n\n/);
+      console.log('📋 Parsing AI response...');
+      console.log('   Response length:', aiResponse?.length || 0);
+      console.log('   First 200 chars:', aiResponse?.substring(0, 200));
       
+      // More flexible parsing - split by common section markers
+      const lines = aiResponse.split('\n');
       let currentSection = '';
+      let summaryText = '';
       
-      sections.forEach(section => {
-        const trimmed = section.trim();
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        const lowerLine = trimmed.toLowerCase();
         
-        if (trimmed.toLowerCase().includes('summary:')) {
+        // Detect section headers (more flexible matching)
+        if (lowerLine.match(/^(1\.|#|\*\*)?.*summary/i) || lowerLine.includes('overview')) {
           currentSection = 'summary';
-        } else if (trimmed.toLowerCase().includes('key topics')) {
+          console.log('   Found section: summary');
+        } else if (lowerLine.match(/^(2\.|#|\*\*)?.*key topics?/i) || lowerLine.includes('topics covered')) {
           currentSection = 'keyTopics';
-        } else if (trimmed.toLowerCase().includes('important points')) {
+          console.log('   Found section: keyTopics');
+        } else if (lowerLine.match(/^(3\.|#|\*\*)?.*important points?/i) || lowerLine.includes('key points') || lowerLine.includes('main points')) {
           currentSection = 'importantPoints';
-        } else if (trimmed.toLowerCase().includes('discussion')) {
+          console.log('   Found section: importantPoints');
+        } else if (lowerLine.match(/^(4\.|#|\*\*)?.*discussion/i) || lowerLine.includes('highlights')) {
           currentSection = 'discussionHighlights';
-        } else if (trimmed.toLowerCase().includes('action items')) {
+          console.log('   Found section: discussionHighlights');
+        } else if (lowerLine.match(/^(5\.|#|\*\*)?.*action items?/i) || lowerLine.includes('homework') || lowerLine.includes('tasks')) {
           currentSection = 'actionItems';
-        } else if (trimmed.toLowerCase().includes('recommendations')) {
+          console.log('   Found section: actionItems');
+        } else if (lowerLine.match(/^(6\.|#|\*\*)?.*recommendations?/i) || lowerLine.includes('next steps') || lowerLine.includes('suggestions')) {
           currentSection = 'recommendations';
+          console.log('   Found section: recommendations');
         } else if (trimmed && currentSection) {
-          // Extract bullet points
-          const lines = trimmed.split('\n').filter(line => line.trim());
-          lines.forEach(line => {
-            const cleaned = line.replace(/^[-*•]\s*/, '').trim();
-            if (cleaned) {
-              if (currentSection === 'summary') {
-                summary.summary += cleaned + ' ';
-              } else if (Array.isArray(summary[currentSection])) {
-                summary[currentSection].push(cleaned);
-              }
+          // Extract content - handle various bullet formats
+          let cleaned = trimmed
+            .replace(/^[-*•●○]\s*/, '')  // Remove bullet points
+            .replace(/^\d+\.\s*/, '')     // Remove numbered lists
+            .replace(/^\*\*|\*\*$/g, '')  // Remove bold markers
+            .trim();
+          
+          // Skip section headers and empty lines
+          if (cleaned && !cleaned.match(/^(summary|key topics?|important points?|discussion|action items?|recommendations?):?$/i)) {
+            if (currentSection === 'summary') {
+              summaryText += cleaned + ' ';
+            } else if (Array.isArray(summary[currentSection])) {
+              summary[currentSection].push(cleaned);
             }
-          });
+          }
         }
       });
       
-      // Fallback: if parsing failed, use entire response as summary
+      // Set summary text
+      summary.summary = summaryText.trim();
+      
+      // Fallback: if parsing failed completely, use entire response as summary
       if (!summary.summary && aiResponse) {
-        summary.summary = aiResponse.substring(0, 500);
+        console.log('⚠️ Parsing failed, using entire response as summary');
+        summary.summary = aiResponse.substring(0, 1000);
+        
+        // Try to extract at least some bullet points
+        const bulletPoints = aiResponse.match(/[-*•●]\s*(.+)/g);
+        if (bulletPoints && bulletPoints.length > 0) {
+          summary.keyTopics = bulletPoints.slice(0, 5).map(bp => bp.replace(/^[-*•●]\s*/, '').trim());
+        }
       }
       
+      console.log('✅ Parsing complete:');
+      console.log('   Summary length:', summary.summary?.length || 0);
+      console.log('   Key topics:', summary.keyTopics?.length || 0);
+      console.log('   Important points:', summary.importantPoints?.length || 0);
+      console.log('   Action items:', summary.actionItems?.length || 0);
+      
     } catch (error) {
-      console.error('Error parsing AI response:', error);
-      summary.summary = aiResponse;
+      console.error('❌ Error parsing AI response:', error);
+      summary.summary = aiResponse || 'Failed to generate summary';
     }
     
     return summary;

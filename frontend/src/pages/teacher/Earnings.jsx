@@ -8,8 +8,6 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  CreditCard,
-  Building2,
   Loader2,
   Plus
 } from 'lucide-react';
@@ -26,18 +24,6 @@ export default function TeacherEarnings() {
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  
-  // Payment settings
-  const [showPaymentSettings, setShowPaymentSettings] = useState(false);
-  const [payoutMethod, setPayoutMethod] = useState('esewa');
-  const [esewaId, setEsewaId] = useState('');
-  const [bankDetails, setBankDetails] = useState({
-    accountName: '',
-    accountNumber: '',
-    bankName: '',
-    branchName: ''
-  });
-  const [savingSettings, setSavingSettings] = useState(false);
 
   // Payout request
   const [showPayoutModal, setShowPayoutModal] = useState(false);
@@ -60,14 +46,6 @@ export default function TeacherEarnings() {
 
       if (balanceRes.success) {
         setBalance(balanceRes.data);
-        setPayoutMethod(balanceRes.data.payoutMethod || 'esewa');
-        setEsewaId(balanceRes.data.esewaId || '');
-        setBankDetails(balanceRes.data.bankDetails || {
-          accountName: '',
-          accountNumber: '',
-          bankName: '',
-          branchName: ''
-        });
       }
 
       if (earningsRes.success) {
@@ -82,38 +60,6 @@ export default function TeacherEarnings() {
       toast.error(error.message || 'Failed to load earnings data');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSavePaymentSettings = async () => {
-    if (payoutMethod === 'esewa' && !esewaId) {
-      toast.error('Please enter your eSewa ID');
-      return;
-    }
-
-    if (payoutMethod === 'bank' && (!bankDetails.accountNumber || !bankDetails.bankName)) {
-      toast.error('Please fill in all bank details');
-      return;
-    }
-
-    setSavingSettings(true);
-    try {
-      const response = await teacherBalanceService.updatePaymentSettings({
-        payoutMethod,
-        esewaId: payoutMethod === 'esewa' ? esewaId : undefined,
-        bankDetails: payoutMethod === 'bank' ? bankDetails : undefined
-      });
-
-      if (response.success) {
-        toast.success('Payment settings updated successfully');
-        setBalance(response.data);
-        setShowPaymentSettings(false);
-      }
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      toast.error(error.message || 'Failed to update payment settings');
-    } finally {
-      setSavingSettings(false);
     }
   };
 
@@ -237,20 +183,20 @@ export default function TeacherEarnings() {
       </div>
 
       {/* Payment Settings Alert */}
-      {balance?.payoutMethod === 'not_set' && (
+      {!balance?.esewaId && !balance?.esewaQRCode && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h3 className="font-semibold text-yellow-900">Payment Method Required</h3>
+            <h3 className="font-semibold text-yellow-900">Payment Details Required</h3>
             <p className="text-sm text-yellow-700 mt-1">
-              Please set up your payment method to receive earnings
+              Please set up your eSewa payment details to receive payments from students
             </p>
             <Button
-              onClick={() => setShowPaymentSettings(true)}
+              onClick={() => window.location.href = '/teacher/payment-settings'}
               className="mt-3 bg-yellow-600 hover:bg-yellow-700"
               size="sm"
             >
-              Set Up Payment Method
+              Go to Payment Settings
             </Button>
           </div>
         </div>
@@ -260,17 +206,11 @@ export default function TeacherEarnings() {
       <div className="flex gap-3">
         <Button
           onClick={() => setShowPayoutModal(true)}
-          disabled={!balance?.availableBalance || balance.availableBalance < 100 || balance.payoutMethod === 'not_set'}
+          disabled={!balance?.availableBalance || balance.availableBalance < 100 || (!balance?.esewaId && !balance?.esewaQRCode)}
           className="bg-green-600 hover:bg-green-700"
         >
           <Plus className="w-4 h-4 mr-2" />
           Request Payout
-        </Button>
-        <Button
-          onClick={() => setShowPaymentSettings(true)}
-          variant="outline"
-        >
-          {balance?.payoutMethod === 'not_set' ? 'Set Up' : 'Update'} Payment Method
         </Button>
       </div>
 
@@ -431,140 +371,6 @@ export default function TeacherEarnings() {
         </div>
       )}
 
-      {/* Payment Settings Modal */}
-      {showPaymentSettings && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-xl font-semibold mb-4">Payment Settings</h3>
-
-            <div className="space-y-4">
-              {/* Payment Method Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Payment Method
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setPayoutMethod('esewa')}
-                    className={`p-4 border-2 rounded-lg flex flex-col items-center gap-2 ${
-                      payoutMethod === 'esewa'
-                        ? 'border-green-600 bg-green-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <CreditCard className="w-6 h-6" />
-                    <span className="font-medium">eSewa</span>
-                  </button>
-                  <button
-                    onClick={() => setPayoutMethod('bank')}
-                    className={`p-4 border-2 rounded-lg flex flex-col items-center gap-2 ${
-                      payoutMethod === 'bank'
-                        ? 'border-green-600 bg-green-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <Building2 className="w-6 h-6" />
-                    <span className="font-medium">Bank</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* eSewa ID */}
-              {payoutMethod === 'esewa' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    eSewa ID
-                  </label>
-                  <Input
-                    type="text"
-                    value={esewaId}
-                    onChange={(e) => setEsewaId(e.target.value)}
-                    placeholder="Enter your eSewa ID (phone/email)"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Enter the phone number or email linked to your eSewa account
-                  </p>
-                </div>
-              )}
-
-              {/* Bank Details */}
-              {payoutMethod === 'bank' && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Account Name
-                    </label>
-                    <Input
-                      type="text"
-                      value={bankDetails.accountName}
-                      onChange={(e) => setBankDetails({ ...bankDetails, accountName: e.target.value })}
-                      placeholder="Account holder name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Account Number
-                    </label>
-                    <Input
-                      type="text"
-                      value={bankDetails.accountNumber}
-                      onChange={(e) => setBankDetails({ ...bankDetails, accountNumber: e.target.value })}
-                      placeholder="Bank account number"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Bank Name
-                    </label>
-                    <Input
-                      type="text"
-                      value={bankDetails.bankName}
-                      onChange={(e) => setBankDetails({ ...bankDetails, bankName: e.target.value })}
-                      placeholder="e.g., Nepal Bank Limited"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Branch Name
-                    </label>
-                    <Input
-                      type="text"
-                      value={bankDetails.branchName}
-                      onChange={(e) => setBankDetails({ ...bankDetails, branchName: e.target.value })}
-                      placeholder="Branch location"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <Button
-                onClick={handleSavePaymentSettings}
-                disabled={savingSettings}
-                className="flex-1 bg-green-600 hover:bg-green-700"
-              >
-                {savingSettings ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  'Save Settings'
-                )}
-              </Button>
-              <Button
-                onClick={() => setShowPaymentSettings(false)}
-                variant="outline"
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Payout Request Modal */}
       {showPayoutModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -608,13 +414,16 @@ export default function TeacherEarnings() {
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-sm text-blue-800">
-                  <strong>Payout Method:</strong> {balance?.payoutMethod === 'esewa' ? 'eSewa' : 'Bank Transfer'}
+                  <strong>Payout Method:</strong> eSewa
                 </p>
-                {balance?.payoutMethod === 'esewa' && (
+                {balance?.esewaId && (
                   <p className="text-sm text-blue-800 mt-1">
                     <strong>eSewa ID:</strong> {balance?.esewaId}
                   </p>
                 )}
+                <p className="text-xs text-blue-600 mt-2">
+                  Payout will be sent to your configured eSewa account
+                </p>
               </div>
             </div>
 

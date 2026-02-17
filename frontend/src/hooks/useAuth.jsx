@@ -217,7 +217,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // ---------------- REFRESH USER DATA ----------------
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const res = await axiosInstance.get("/users/me", {
         withCredentials: true,
@@ -225,13 +225,22 @@ export const AuthProvider = ({ children }) => {
       });
 
       const currentUser = res.data.user || res.data.data || null;
+      
+      // Update user state
       setUser(currentUser);
+      
+      console.log('✅ User data refreshed:', {
+        userId: currentUser?._id,
+        hasEsewaId: !!currentUser?.esewaId,
+        hasQRCode: !!currentUser?.esewaQRCode
+      });
+      
       return currentUser;
     } catch (error) {
       console.error("Failed to refresh user data:", error);
       return null;
     }
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
