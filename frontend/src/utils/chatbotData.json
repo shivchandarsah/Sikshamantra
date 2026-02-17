@@ -1,0 +1,259 @@
+{
+  "project_name": "Siksha Mantra - Student-Teacher Collaboration Platform",
+  "version": "1.0",
+  "description": "Comprehensive chatbot training dataset for Siksha Mantra platform",
+  "intents": [
+    {
+      "intent": "greeting",
+      "patterns": ["hi", "hello", "hey", "good morning", "good afternoon", "good evening", "what's up", "howdy", "greetings", "namaste"],
+      "responses": ["Hello! Welcome to Siksha Mantra. How can I help you today?", "Hi there! I'm here to assist you with the platform. What do you need help with?", "Namaste! Welcome to Siksha Mantra. How may I assist you?"]
+    },
+    {
+      "intent": "platform_overview",
+      "patterns": ["what is siksha mantra", "tell me about this platform", "what can I do here", "platform features", "how does this work"],
+      "responses": ["Siksha Mantra is a student-teacher collaboration platform where students can post learning requests and teachers can offer help. Features include real-time meetings, course materials, appointments, and chat messaging."]
+    },
+    {
+      "intent": "registration_student",
+      "patterns": ["how to register as student", "student signup", "create student account", "register student", "student registration process"],
+      "responses": ["To register as a student: 1) Click 'Register' on the homepage, 2) Fill in your name, email, and password, 3) Select 'Student' as your role, 4) Verify your email, 5) Complete your profile with grade, subjects, and bio."]
+    },
+    {
+      "intent": "registration_teacher",
+      "patterns": ["how to register as teacher", "teacher signup", "create teacher account", "register teacher", "teacher registration process"],
+      "responses": ["To register as a teacher: 1) Click 'Register' on the homepage, 2) Fill in your name, email, and password, 3) Select 'Teacher' as your role, 4) Verify your email, 5) Complete your profile with qualifications, subjects, experience, and hourly rate."]
+    },
+    {
+      "intent": "login_help",
+      "patterns": ["how to login", "can't login", "login issues", "forgot password", "reset password"],
+      "responses": ["To login: Enter your registered email and password on the login page. If you forgot your password, click 'Forgot Password' and follow the email instructions to reset it."]
+    }
+,
+    {
+      "intent": "student_post_request",
+      "patterns": ["how to post a request", "create learning request", "post help request", "ask for help", "how to request teacher help"],
+      "responses": ["To post a request: 1) Go to your Student Dashboard, 2) Click 'Requests', 3) Click 'Create New Request', 4) Fill in title, description, subject, grade, budget, and deadline, 5) Submit. Teachers will see your request and can offer help."]
+    },
+    {
+      "intent": "teacher_offer_help",
+      "patterns": ["how to offer help", "respond to student request", "make an offer", "how teachers help students"],
+      "responses": ["To offer help: 1) Go to 'Explore Requests' in your Teacher Dashboard, 2) Browse student requests, 3) Click on a request to view details, 4) Click 'Make Offer', 5) Set your price and add a message, 6) Submit offer. Students will review and can accept your offer."]
+    },
+    {
+      "intent": "accept_offer",
+      "patterns": ["how to accept offer", "accept teacher offer", "choose teacher", "select offer"],
+      "responses": ["To accept an offer: 1) Go to 'Requests' in your Student Dashboard, 2) Click on your request, 3) View all offers from teachers, 4) Compare prices and teacher profiles, 5) Click 'Accept' on your preferred offer. This creates an appointment."]
+    },
+    {
+      "intent": "meetings_video_call",
+      "patterns": ["how to start meeting", "video call", "online meeting", "join meeting", "meeting features"],
+      "responses": ["Meetings feature includes: 1) Video/Audio calls with WebRTC, 2) Screen sharing, 3) Digital whiteboard for teaching, 4) Chat during meeting, 5) Meeting reminders. Access from 'Meetings' in your dashboard or through appointment notifications."]
+    },
+    {
+      "intent": "courses_upload",
+      "patterns": ["how to upload course", "share course materials", "upload study material", "teacher upload files"],
+      "responses": ["Teachers can upload courses: 1) Go to 'Courses' in Teacher Dashboard, 2) Click 'Upload Course', 3) Fill in title, description, subject, grade, and tags, 4) Select file (max 10MB - PDF, DOC, PPT), 5) Submit. Students can browse and download your materials."]
+    },
+    {
+      "intent": "courses_download",
+      "patterns": ["how to download course", "get study materials", "download course files", "access course materials"],
+      "responses": ["Students can download courses: 1) Go to 'Courses' in Student Dashboard, 2) Use search and filters (subject, grade, tags), 3) Browse available courses, 4) Click 'Download Course' on any material. Track download counts to see popular materials."]
+    },
+    {
+      "intent": "chat_messaging",
+      "patterns": ["how to chat", "send message", "messaging feature", "talk to teacher", "contact student"],
+      "responses": ["Chat feature allows real-time messaging between students and teachers. Access chat from your dashboard, send text messages, receive notifications, and maintain conversation history. Great for quick questions and coordination."]
+    },
+    {
+      "intent": "notifications",
+      "patterns": ["notification system", "how do I get notified", "alerts", "reminders"],
+      "responses": ["Siksha Mantra sends notifications for: 1) New offers on your requests, 2) Accepted offers, 3) Upcoming meetings (15 min before), 4) New chat messages, 5) Appointment updates. Enable browser notifications for real-time alerts."]
+    },
+    {
+      "intent": "profile_edit",
+      "patterns": ["edit profile", "update profile", "change profile picture", "modify profile information"],
+      "responses": ["To edit profile: 1) Click on your profile icon, 2) Go to 'Profile', 3) Click 'Edit Profile', 4) Update your information (name, bio, subjects, grade/qualifications, profile picture), 5) Save changes. Keep your profile updated for better connections."]
+    },
+    {
+      "intent": "admin_access",
+      "patterns": ["admin login", "admin panel", "administrator access", "admin features"],
+      "responses": ["Admin panel is for platform administrators only. Login with admin credentials at admin@sikshamantra.com. Features include: user management, content moderation, analytics, system monitoring, and role management."]
+    },
+    {
+      "intent": "payment_pricing",
+      "patterns": ["how much does it cost", "pricing", "payment", "teacher rates", "budget"],
+      "responses": ["Students set their budget when posting requests. Teachers set their hourly rates in their profiles and can customize offers. Payment terms are agreed upon between students and teachers. The platform facilitates connections."]
+    },
+    {
+      "intent": "search_filter",
+      "patterns": ["how to search", "filter requests", "find courses", "search teachers"],
+      "responses": ["Use search and filters throughout the platform: 1) Courses: Filter by subject, grade, tags, 2) Requests: Filter by subject, grade, budget, 3) Use search bars for keywords. Filters help you find exactly what you need quickly."]
+    },
+    {
+      "intent": "technical_requirements",
+      "patterns": ["system requirements", "browser support", "technical specs", "what browser to use"],
+      "responses": ["Siksha Mantra works on: Chrome, Firefox, Safari, Edge (latest versions). For meetings, enable camera and microphone permissions. Stable internet connection recommended. Mobile responsive design works on all devices."]
+    },
+    {
+      "intent": "privacy_security",
+      "patterns": ["is it safe", "privacy policy", "data security", "personal information"],
+      "responses": ["Your privacy is important. We use secure authentication, encrypted connections, and protect your personal data. Only share information you're comfortable with. Report any suspicious activity to administrators."]
+    },
+    {
+      "intent": "troubleshooting",
+      "patterns": ["not working", "error", "problem", "bug", "issue"],
+      "responses": ["Common fixes: 1) Refresh the page, 2) Clear browser cache, 3) Check internet connection, 4) Enable required permissions (camera/mic for meetings), 5) Try different browser. If issues persist, contact support."]
+    },
+    {
+      "intent": "dashboard_navigation",
+      "patterns": ["dashboard features", "navigate dashboard", "sidebar menu", "what's in dashboard"],
+      "responses": ["Student Dashboard: Requests, Accepted Offers, Courses, Profile, Meetings. Teacher Dashboard: Explore Requests, Offered, Courses, Profile, Meetings. Use the sidebar menu to navigate between sections."]
+    },
+    {
+      "intent": "appointment_management",
+      "patterns": ["manage appointments", "appointment schedule", "view appointments", "upcoming sessions"],
+      "responses": ["Appointments are created when students accept teacher offers. View them in 'Accepted Offers' (students) or 'Offered' (teachers). Get reminders 15 minutes before meetings. Join directly from appointment cards."]
+    },
+    {
+      "intent": "whiteboard_feature",
+      "patterns": ["digital whiteboard", "drawing board", "whiteboard in meeting", "teaching tools"],
+      "responses": ["Digital whiteboard in meetings allows: 1) Drawing and writing, 2) Multiple colors, 3) Eraser tool, 4) Clear board, 5) Real-time collaboration. Perfect for explaining concepts, solving problems, and visual teaching."]
+    },
+    {
+      "intent": "screen_sharing",
+      "patterns": ["share screen", "screen sharing", "show my screen", "presentation mode"],
+      "responses": ["Screen sharing in meetings: 1) Click 'Share Screen' button, 2) Select window/tab to share, 3) Click 'Share', 4) Stop sharing anytime. Great for presentations, code reviews, and demonstrating concepts."]
+    },
+    {
+      "intent": "subjects_offered",
+      "patterns": ["what subjects", "available subjects", "topics covered", "subject list"],
+      "responses": ["Siksha Mantra supports all subjects: Mathematics, Science, English, Social Studies, Languages, Computer Science, Arts, and more. Students specify subjects in requests, teachers list their expertise in profiles."]
+    },
+    {
+      "intent": "grade_levels",
+      "patterns": ["what grades", "grade levels", "class levels", "education levels"],
+      "responses": ["Platform supports all grade levels from elementary to higher education (Grade 1-12 and beyond). Specify your grade level in your profile and when posting requests or uploading courses."]
+    },
+    {
+      "intent": "file_formats",
+      "patterns": ["what file types", "supported formats", "file upload formats", "document types"],
+      "responses": ["Supported course file formats: PDF (.pdf), Word (.doc, .docx), PowerPoint (.ppt, .pptx), Text (.txt). Maximum file size: 10MB. Files are securely stored and available for download."]
+    },
+    {
+      "intent": "delete_account",
+      "patterns": ["delete account", "remove account", "close account", "deactivate profile"],
+      "responses": ["To delete your account, contact the administrator. Note: This will permanently remove your profile, posts, offers, and all associated data. This action cannot be undone."]
+    },
+    {
+      "intent": "contact_support",
+      "patterns": ["contact support", "help desk", "customer service", "get help", "support team"],
+      "responses": ["Need help? Contact us through: 1) Contact page on the website, 2) Email: support@sikshamantra.com, 3) Admin panel for urgent issues. We're here to help you!"]
+    },
+    {
+      "intent": "best_practices_student",
+      "patterns": ["tips for students", "student best practices", "how to get best help", "student advice"],
+      "responses": ["Student tips: 1) Write clear, detailed requests, 2) Set realistic budgets, 3) Review teacher profiles before accepting, 4) Be punctual for meetings, 5) Download relevant course materials, 6) Communicate clearly with teachers."]
+    },
+    {
+      "intent": "best_practices_teacher",
+      "patterns": ["tips for teachers", "teacher best practices", "how to get more students", "teacher advice"],
+      "responses": ["Teacher tips: 1) Complete your profile with qualifications, 2) Upload quality course materials, 3) Respond promptly to requests, 4) Set competitive rates, 5) Be professional in meetings, 6) Build good ratings through quality teaching."]
+    },
+    {
+      "intent": "rating_system",
+      "patterns": ["ratings", "reviews", "feedback system", "rate teacher"],
+      "responses": ["After sessions, students can rate teachers and provide feedback. Good ratings help teachers attract more students. Teachers should strive for quality teaching to maintain high ratings."]
+    },
+    {
+      "intent": "mobile_access",
+      "patterns": ["mobile app", "use on phone", "mobile version", "smartphone access"],
+      "responses": ["Siksha Mantra is mobile-responsive! Access the full platform through your mobile browser. All features work on smartphones and tablets. No separate app needed - just visit the website on your mobile device."]
+    },
+    {
+      "intent": "offline_access",
+      "patterns": ["offline mode", "work offline", "no internet", "download for offline"],
+      "responses": ["Most features require internet connection for real-time collaboration. However, you can download course materials for offline study. Meetings, chat, and live features need active internet."]
+    },
+    {
+      "intent": "multiple_requests",
+      "patterns": ["post multiple requests", "how many requests", "request limit", "multiple posts"],
+      "responses": ["Students can post multiple requests for different subjects or topics. There's no limit. Manage all your requests from the 'Requests' section in your dashboard."]
+    },
+    {
+      "intent": "cancel_request",
+      "patterns": ["cancel request", "delete request", "remove post", "cancel offer"],
+      "responses": ["To cancel/delete a request: Go to 'Requests', find your request, click options menu, select 'Delete'. Note: If offers are already accepted, coordinate with the teacher before canceling."]
+    },
+    {
+      "intent": "edit_request",
+      "patterns": ["edit request", "modify request", "update request", "change request details"],
+      "responses": ["To edit a request: Go to 'Requests', click on your request, select 'Edit', update details (title, description, budget, deadline), save changes. Teachers will see the updated information."]
+    },
+    {
+      "intent": "meeting_recording",
+      "patterns": ["record meeting", "save meeting", "meeting recording", "video recording"],
+      "responses": ["Currently, meeting recording is not built-in. You can use external screen recording software if both parties agree. Always get consent before recording any session."]
+    },
+    {
+      "intent": "timezone_support",
+      "patterns": ["timezone", "different time zones", "international students", "time difference"],
+      "responses": ["The platform displays times in your local timezone. When scheduling meetings, coordinate with your teacher/student about time zones. Meeting times are automatically converted to your local time."]
+    },
+    {
+      "intent": "language_support",
+      "patterns": ["languages supported", "different languages", "language options", "multilingual"],
+      "responses": ["Currently, Siksha Mantra interface is in English. However, teachers and students can communicate in any language they're comfortable with during chats and meetings."]
+    },
+    {
+      "intent": "verification_process",
+      "patterns": ["email verification", "verify account", "verification email", "confirm email"],
+      "responses": ["After registration, check your email for verification link. Click the link to verify your account. If you don't receive it, check spam folder or request a new verification email from the login page."]
+    },
+    {
+      "intent": "goodbye",
+      "patterns": ["bye", "goodbye", "see you", "talk to you later", "thanks", "thank you"],
+      "responses": ["You're welcome! Happy learning on Siksha Mantra!", "Goodbye! Feel free to ask if you need more help.", "Thank you for using Siksha Mantra. Have a great day!"]
+    }
+  ],
+  "entities": {
+    "roles": ["student", "teacher", "admin"],
+    "subjects": ["Mathematics", "Science", "English", "Social Studies", "Computer Science", "Languages", "Arts"],
+    "grades": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+    "file_types": [".pdf", ".doc", ".docx", ".ppt", ".pptx", ".txt"],
+    "features": ["meetings", "courses", "chat", "appointments", "whiteboard", "screen sharing", "notifications"]
+  },
+  "faq": [
+    {
+      "question": "How do I get started as a student?",
+      "answer": "Register with your email, verify your account, complete your profile with grade and subjects, then start posting learning requests or browsing course materials."
+    },
+    {
+      "question": "How do I get started as a teacher?",
+      "answer": "Register as a teacher, verify your email, complete your profile with qualifications and hourly rate, then browse student requests to offer help or upload course materials."
+    },
+    {
+      "question": "What makes Siksha Mantra different?",
+      "answer": "Siksha Mantra combines request-based learning, real-time video meetings with whiteboard, course material sharing, and integrated chat - all in one platform designed specifically for student-teacher collaboration."
+    },
+    {
+      "question": "Is there a mobile app?",
+      "answer": "The platform is fully mobile-responsive and works perfectly in mobile browsers. No separate app is needed - just access through your phone's browser."
+    },
+    {
+      "question": "How secure is my data?",
+      "answer": "We use industry-standard security practices including encrypted connections, secure authentication, and data protection. Your personal information is never shared without consent."
+    },
+    {
+      "question": "Can I use this for group learning?",
+      "answer": "Currently, the platform is designed for one-on-one student-teacher interactions. However, teachers can upload course materials that multiple students can access."
+    },
+    {
+      "question": "What if I have technical issues during a meeting?",
+      "answer": "Try refreshing the page, checking your internet connection, and ensuring camera/microphone permissions are enabled. If issues persist, reschedule and contact support."
+    },
+    {
+      "question": "How do I become a better teacher on the platform?",
+      "answer": "Complete your profile thoroughly, upload quality course materials, respond promptly to requests, maintain professionalism, and deliver quality teaching to build good ratings."
+    }
+  ]
+}

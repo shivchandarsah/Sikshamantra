@@ -1,0 +1,51 @@
+<svg width="180" height="40" viewBox="0 0 180 40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D9488;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="secondaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Compact logo icon -->
+  <g transform="translate(5, 5)">
+    <!-- Book -->
+    <path d="M2 25 L2 8 Q2 5 5 5 L25 5 Q28 5 28 8 L28 25 Q28 28 25 28 L5 28 Q2 28 2 25 Z" 
+          fill="url(#primaryGrad)" opacity="0.9"/>
+    
+    <!-- Book pages -->
+    <rect x="4" y="8" width="22" height="17" fill="white" opacity="0.95" rx="1"/>
+    <line x1="15" y1="8" x2="15" y2="25" stroke="url(#primaryGrad)" stroke-width="0.5" opacity="0.3"/>
+    
+    <!-- Text lines -->
+    <line x1="6" y1="12" x2="13" y2="12" stroke="url(#secondaryGrad)" stroke-width="1" opacity="0.7"/>
+    <line x1="17" y1="12" x2="24" y2="12" stroke="url(#secondaryGrad)" stroke-width="1" opacity="0.7"/>
+    <line x1="6" y1="15" x2="13" y2="15" stroke="url(#secondaryGrad)" stroke-width="0.8" opacity="0.6"/>
+    <line x1="17" y1="15" x2="24" y2="15" stroke="url(#secondaryGrad)" stroke-width="0.8" opacity="0.6"/>
+    
+    <!-- Graduation cap -->
+    <g transform="translate(10, 0)">
+      <ellipse cx="5" cy="5" rx="6" ry="2" fill="url(#accentGrad)"/>
+      <rect x="1" y="3" width="8" height="3" fill="url(#accentGrad)" rx="0.5"/>
+      <circle cx="8" cy="5" r="1" fill="url(#accentGrad)"/>
+    </g>
+  </g>
+  
+  <!-- Text "Siksha Mantra" in one line -->
+  <g transform="translate(45, 12)">
+    <text x="0" y="15" font-family="Arial, sans-serif" font-size="16" font-weight="bold">
+      <tspan fill="url(#primaryGrad)">Siksha</tspan>
+      <tspan fill="url(#secondaryGrad)" dx="4">Mantra</tspan>
+    </text>
+  </g>
+</svg>

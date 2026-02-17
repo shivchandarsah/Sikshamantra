@@ -1,0 +1,23 @@
+{
+  "short_name": "Siksha Mantra",
+  "name": "Siksha Mantra - Educational Platform",
+  "description": "Connect students and teachers for personalized learning experiences",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0D9488",
+  "background_color": "#ffffff",
+  "categories": ["education", "learning", "teaching"]
+}

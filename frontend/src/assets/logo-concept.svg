@@ -1,0 +1,23 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo Icon - Connected Circles -->
+  <g transform="translate(10, 15)">
+    <!-- Left Circle (Student) -->
+    <circle cx="10" cy="15" r="8" fill="#3B82F6" opacity="0.8"/>
+    <circle cx="10" cy="15" r="4" fill="white"/>
+    
+    <!-- Connection Line -->
+    <line x1="18" y1="15" x2="22" y2="15" stroke="#10B981" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Right Circle (Teacher) -->
+    <circle cx="30" cy="15" r="8" fill="#10B981" opacity="0.8"/>
+    <circle cx="30" cy="15" r="4" fill="white"/>
+  </g>
+  
+  <!-- Logo Text -->
+  <text x="60" y="25" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1F2937">
+    Learn
+  </text>
+  <text x="60" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#3B82F6">
+    Link
+  </text>
+</svg>

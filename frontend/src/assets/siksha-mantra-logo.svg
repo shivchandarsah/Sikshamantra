@@ -1,0 +1,73 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D9488;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="secondaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle for depth -->
+  <circle cx="30" cy="30" r="25" fill="url(#primaryGradient)" opacity="0.1"/>
+  
+  <!-- Main logo icon -->
+  <g transform="translate(10, 10)">
+    <!-- Book/Knowledge symbol -->
+    <path d="M5 35 L5 10 Q5 5 10 5 L35 5 Q40 5 40 10 L40 35 Q40 40 35 40 L10 40 Q5 40 5 35 Z" 
+          fill="url(#primaryGradient)" opacity="0.9"/>
+    
+    <!-- Open book pages -->
+    <path d="M8 12 L37 12 L37 37 L8 37 Z" fill="white" opacity="0.95"/>
+    <path d="M22.5 12 L22.5 37" stroke="url(#primaryGradient)" stroke-width="1" opacity="0.3"/>
+    
+    <!-- Text lines on book -->
+    <line x1="11" y1="18" x2="19" y2="18" stroke="url(#secondaryGradient)" stroke-width="1.5" opacity="0.7"/>
+    <line x1="26" y1="18" x2="34" y2="18" stroke="url(#secondaryGradient)" stroke-width="1.5" opacity="0.7"/>
+    <line x1="11" y1="22" x2="19" y2="22" stroke="url(#secondaryGradient)" stroke-width="1" opacity="0.6"/>
+    <line x1="26" y1="22" x2="34" y2="22" stroke="url(#secondaryGradient)" stroke-width="1" opacity="0.6"/>
+    <line x1="11" y1="26" x2="19" y2="26" stroke="url(#secondaryGradient)" stroke-width="1" opacity="0.6"/>
+    <line x1="26" y1="26" x2="34" y2="26" stroke="url(#secondaryGradient)" stroke-width="1" opacity="0.6"/>
+    
+    <!-- Graduation cap on top -->
+    <g transform="translate(15, 2)">
+      <ellipse cx="7.5" cy="8" rx="8" ry="3" fill="url(#accentGradient)"/>
+      <rect x="2" y="6" width="11" height="4" fill="url(#accentGradient)" rx="1"/>
+      <circle cx="13" cy="8" r="1" fill="url(#accentGradient)"/>
+      <line x1="13" y1="9" x2="13" y2="12" stroke="url(#accentGradient)" stroke-width="0.5"/>
+    </g>
+    
+    <!-- Connecting dots/network -->
+    <circle cx="42" cy="15" r="2" fill="url(#primaryGradient)" opacity="0.8"/>
+    <circle cx="42" cy="25" r="2" fill="url(#secondaryGradient)" opacity="0.8"/>
+    <circle cx="42" cy="35" r="2" fill="url(#accentGradient)" opacity="0.8"/>
+    
+    <!-- Connection lines -->
+    <line x1="40" y1="20" x2="42" y2="15" stroke="url(#primaryGradient)" stroke-width="1" opacity="0.5"/>
+    <line x1="40" y1="25" x2="42" y2="25" stroke="url(#secondaryGradient)" stroke-width="1" opacity="0.5"/>
+    <line x1="40" y1="30" x2="42" y2="35" stroke="url(#accentGradient)" stroke-width="1" opacity="0.5"/>
+  </g>
+  
+  <!-- Text "Siksha Mantra" in one line -->
+  <g transform="translate(65, 20)">
+    <!-- Siksha Mantra in one line -->
+    <text x="0" y="15" font-family="Arial, sans-serif" font-size="18" font-weight="bold">
+      <tspan fill="url(#primaryGradient)">Siksha</tspan>
+      <tspan fill="url(#secondaryGradient)" dx="5">Mantra</tspan>
+    </text>
+    
+    <!-- Tagline -->
+    <text x="0" y="35" font-family="Arial, sans-serif" font-size="9" font-weight="normal" fill="#6B7280" opacity="0.8">
+      Learn • Grow • Excel
+    </text>
+  </g>
+</svg>

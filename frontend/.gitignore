@@ -1,0 +1,20 @@
+# Frontend specific ignores
+# (Root .gitignore handles common patterns)
+
+# Vite specific
+dist-ssr/
+*.local
+
+# Frontend specific environment files
+.env.frontend
+.env.production.frontend
+
+# Storybook
+storybook-static/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build analysis
+bundle-analyzer-report.html

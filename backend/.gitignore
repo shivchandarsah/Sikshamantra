@@ -1,0 +1,14 @@
+# Backend specific ignores
+# (Root .gitignore handles common patterns)
+
+# Backend specific environment files
+.env.backend
+.env.production.backend
+
+# Backend specific logs
+server.log
+api.log
+
+# Backend specific temp files
+uploads/temp/
+temp-files/
