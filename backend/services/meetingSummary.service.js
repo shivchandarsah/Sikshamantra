@@ -7,18 +7,33 @@ class MeetingSummaryService {
   // Generate AI summary from meeting data
   async generateSummary(meetingData) {
     try {
+      console.log('🤖 Generating AI summary...');
+      console.log('   Meeting subject:', meetingData.subject);
+      console.log('   Duration:', meetingData.duration, 'minutes');
+      console.log('   Chat messages:', meetingData.chatMessages?.length || 0);
+      
       // Build prompt for AI
       const prompt = this.buildSummaryPrompt(meetingData);
+      
+      console.log('📝 Prompt built, sending to AI service...');
       
       // Get AI response
       const aiResponse = await aiService.getResponse(prompt);
       
+      console.log('✅ AI response received, length:', aiResponse?.length || 0);
+      
       // Parse AI response into structured format
       const parsedSummary = this.parseAIResponse(aiResponse);
       
+      console.log('✅ AI summary parsed successfully');
+      console.log('   Summary length:', parsedSummary.summary?.length || 0);
+      console.log('   Key topics:', parsedSummary.keyTopics?.length || 0);
+      console.log('   Important points:', parsedSummary.importantPoints?.length || 0);
+      
       return parsedSummary;
     } catch (error) {
-      console.error('Error generating AI summary:', error);
+      console.error('❌ Error generating AI summary:', error.message);
+      console.error('   Stack:', error.stack);
       throw error;
     }
   }
@@ -161,40 +176,79 @@ class MeetingSummaryService {
       if (!summary) {
         throw new Error('Summary not found');
       }
+
+      console.log('📧 Preparing to send summary emails...');
+      console.log('   Summary ID:', summaryId);
+      console.log('   Teacher:', summary.teacher?.fullName, summary.teacher?.email);
+      console.log('   Students:', summary.students?.map(s => `${s.fullName} (${s.email})`).join(', '));
       
       // Build email content
       const emailContent = this.buildEmailContent(summary);
       
+      let emailsSent = 0;
+      let emailsFailed = 0;
+      
       // Send to teacher
       if (summary.teacher && summary.teacher.email) {
-        await sendEmail({
-          to: summary.teacher.email,
-          subject: `Class Summary: ${summary.meeting?.topic || 'Online Class'}`,
-          html: emailContent
-        });
+        try {
+          await sendEmail({
+            to: summary.teacher.email,
+            subject: `Class Summary: ${summary.meeting?.topic || 'Online Class'}`,
+            html: emailContent
+          });
+          console.log('✅ Email sent to teacher:', summary.teacher.email);
+          emailsSent++;
+        } catch (error) {
+          console.error('❌ Failed to send email to teacher:', summary.teacher.email);
+          console.error('   Error:', error.message);
+          emailsFailed++;
+        }
+      } else {
+        console.warn('⚠️ Teacher email not found or invalid');
       }
       
       // Send to students
       if (summary.students && summary.students.length > 0) {
         for (const student of summary.students) {
           if (student && student.email) {
-            await sendEmail({
-              to: student.email,
-              subject: `Class Summary: ${summary.meeting?.topic || 'Online Class'}`,
-              html: emailContent
-            });
+            try {
+              await sendEmail({
+                to: student.email,
+                subject: `Class Summary: ${summary.meeting?.topic || 'Online Class'}`,
+                html: emailContent
+              });
+              console.log('✅ Email sent to student:', student.email);
+              emailsSent++;
+            } catch (error) {
+              console.error('❌ Failed to send email to student:', student.email);
+              console.error('   Error:', error.message);
+              emailsFailed++;
+            }
+          } else {
+            console.warn('⚠️ Student email not found or invalid:', student);
           }
         }
+      } else {
+        console.warn('⚠️ No students found for this summary');
       }
       
-      // Mark as sent
-      summary.emailSent = true;
-      summary.emailSentAt = new Date();
-      await summary.save();
+      console.log(`📊 Email sending complete: ${emailsSent} sent, ${emailsFailed} failed`);
+      
+      // Mark as sent only if at least one email was sent successfully
+      if (emailsSent > 0) {
+        summary.emailSent = true;
+        summary.emailSentAt = new Date();
+        await summary.save();
+        console.log('✅ Summary marked as email sent');
+      } else {
+        console.error('❌ No emails were sent successfully');
+        throw new Error(`Failed to send any emails. ${emailsFailed} attempts failed.`);
+      }
       
       return true;
     } catch (error) {
-      console.error('Error sending summary email:', error);
+      console.error('❌ Error in sendSummaryEmail:', error.message);
+      console.error('   Stack:', error.stack);
       throw error;
     }
   }

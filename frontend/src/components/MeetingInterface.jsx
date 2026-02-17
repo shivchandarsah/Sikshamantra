@@ -402,10 +402,7 @@ export default function MeetingInterface({ meetingData, onClose, onMeetingEnd })
         const meetingDataForSummary = {
           chatMessages: chatMessages,
           whiteboardContent: meetingNotes ? `Notes: ${meetingNotes}` : '',
-          participants: participants.map(p => ({
-            name: p.name,
-            role: p.role
-          })),
+          participants: participants.map(p => `${p.name} (${p.role})`),
           duration: duration,
           transcriptionMethod: transcript.length > 0 ? 'web-speech-api' : 'manual-notes'
         };

@@ -3,14 +3,21 @@ import axios from 'axios';
 
 class AIService {
   constructor() {
-    this.provider = process.env.AI_PROVIDER || 'gemini';
-    this.geminiApiKey = process.env.GEMINI_API_KEY;
-    console.log('🤖 AI Service initialized:');
-    console.log('   Provider:', this.provider);
-    console.log('   API Key:', this.geminiApiKey ? `${this.geminiApiKey.substring(0, 15)}...` : 'NOT SET');
-    
-    // System context about Siksha Mantra
-    this.systemContext = `You are a helpful customer support assistant for Siksha Mantra, an educational platform that connects students and teachers.
+    // Delay initialization to allow dotenv to load
+    this.initialized = false;
+  }
+
+  // Initialize on first use
+  _ensureInitialized() {
+    if (!this.initialized) {
+      this.provider = process.env.AI_PROVIDER || 'gemini';
+      this.geminiApiKey = process.env.GEMINI_API_KEY;
+      console.log('🤖 AI Service initialized:');
+      console.log('   Provider:', this.provider);
+      console.log('   API Key:', this.geminiApiKey ? `${this.geminiApiKey.substring(0, 15)}...` : 'NOT SET');
+      
+      // System context about Siksha Mantra
+      this.systemContext = `You are a helpful customer support assistant for Siksha Mantra, an educational platform that connects students and teachers.
 
 Platform Features:
 - Students can post learning requests
@@ -30,10 +37,15 @@ Key Information:
 - Support email: support@sikshamantra.com
 
 Be helpful, concise, and friendly. Provide step-by-step instructions when needed.`;
+      
+      this.initialized = true;
+    }
   }
 
   // Get response from Google Gemini
   async getGeminiResponse(userMessage, conversationHistory = []) {
+    this._ensureInitialized();
+    
     try {
       if (!this.geminiApiKey || this.geminiApiKey === 'your_gemini_api_key_here') {
         throw new Error('Gemini API key not configured. Please add GEMINI_API_KEY to your .env file');
@@ -78,6 +90,8 @@ Be helpful, concise, and friendly. Provide step-by-step instructions when needed
 
   // Main method to get AI response
   async getResponse(userMessage, conversationHistory = []) {
+    this._ensureInitialized();
+    
     try {
       return await this.getGeminiResponse(userMessage, conversationHistory);
     } catch (error) {
@@ -89,25 +103,10 @@ Be helpful, concise, and friendly. Provide step-by-step instructions when needed
 
   // Check if AI service is configured
   isConfigured() {
+    this._ensureInitialized();
     return !!(this.geminiApiKey && this.geminiApiKey !== 'your_gemini_api_key_here');
   }
 }
 
-// Don't instantiate immediately - let it be instantiated after dotenv loads
-let instance = null;
-
-export default {
-  getInstance() {
-    if (!instance) {
-      instance = new AIService();
-    }
-    return instance;
-  },
-  // For backward compatibility, expose methods directly
-  getResponse(...args) {
-    return this.getInstance().getResponse(...args);
-  },
-  isConfigured() {
-    return this.getInstance().isConfigured();
-  }
-};
+// Export a singleton instance
+export default new AIService();

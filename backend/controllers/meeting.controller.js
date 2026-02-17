@@ -356,8 +356,10 @@ const updateMeetingStatus = asyncHandler(async (req, res) => {
     console.log('🤖 Starting AI summary generation...');
     console.log('📊 Meeting data received:', {
       hasChatMessages: !!meetingData.chatMessages,
+      chatMessagesCount: meetingData.chatMessages?.length || 0,
       hasWhiteboardContent: !!meetingData.whiteboardContent,
-      hasParticipants: !!meetingData.participants
+      hasParticipants: !!meetingData.participants,
+      participantsCount: meetingData.participants?.length || 0
     });
     
     try {
@@ -380,35 +382,53 @@ const updateMeetingStatus = asyncHandler(async (req, res) => {
         chatMessages: meetingData.chatMessages || [],
         whiteboardContent: meetingData.whiteboardContent || '',
         participants: [
-          { name: meeting.teacherId.fullName, role: 'teacher' },
-          { name: meeting.studentId.fullName, role: 'student' }
+          `${meeting.teacherId.fullName} (Teacher)`,
+          `${meeting.studentId.fullName} (Student)`
         ]
       };
 
-      console.log('📝 Summary data prepared for:', summaryData.subject);
+      console.log('📝 Summary data prepared:', {
+        subject: summaryData.subject,
+        duration: summaryData.duration,
+        chatMessagesCount: summaryData.chatMessages.length,
+        hasWhiteboardContent: !!summaryData.whiteboardContent
+      });
 
       // Generate summary asynchronously (don't wait)
       meetingSummaryService.createMeetingSummary(meetingId, summaryData)
         .then(summary => {
-          console.log('✅ Meeting summary generated:', summary._id);
+          console.log('✅ Meeting summary generated successfully:', summary._id);
           // Send emails asynchronously
           return meetingSummaryService.sendSummaryEmail(summary._id);
         })
         .then(() => {
-          console.log('✅ Summary emails sent successfully');
+          console.log('✅ Summary emails sent successfully to teacher and student');
         })
         .catch(err => {
-          console.error('❌ Error generating meeting summary:', err.message);
-          console.error('❌ Full error:', err);
+          console.error('❌ Error in AI summary generation or email sending:');
+          console.error('   Error message:', err.message);
+          console.error('   Error stack:', err.stack);
+          
+          // Create notification for admin about the failure
+          Notification.create({
+            recipient: meeting.teacherId,
+            type: "system",
+            title: "AI Summary Generation Failed",
+            message: `Failed to generate AI summary for meeting "${meeting.subject}". Error: ${err.message}`,
+            data: { meetingId: meeting._id }
+          }).catch(notifErr => console.error('Failed to create error notification:', notifErr));
         });
     } catch (error) {
-      console.error('❌ Error preparing meeting summary:', error.message);
-      console.error('❌ Full error:', error);
+      console.error('❌ Error preparing meeting summary:');
+      console.error('   Error message:', error.message);
+      console.error('   Error stack:', error.stack);
       // Don't fail the status update if summary generation fails
     }
   } else {
     if (status === 'completed' && !meetingData) {
-      console.log('⚠️ Meeting marked as completed but no meetingData provided - AI summary will not be generated');
+      console.log('⚠️ Meeting marked as completed but no meetingData provided');
+      console.log('   AI summary will not be generated');
+      console.log('   Meeting ID:', meetingId);
     }
   }
 

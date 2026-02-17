@@ -16,21 +16,41 @@ const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [lastFetchTime, setLastFetchTime] = useState(null);
   
   const { notificationDb, user, loading: authLoading, initialized } = useMyContext();
   const navigate = useNavigate();
 
-  // Fetch notifications when panel opens
+  // Fetch notifications when panel opens OR on initial load
   useEffect(() => {
-    if (isOpen && initialized && user && user._id && !authLoading) {
+    if (initialized && user && user._id && !authLoading) {
+      // Fetch notifications immediately on mount (in background)
       fetchNotifications();
     }
-  }, [isOpen, user, initialized, authLoading]);
+  }, [user, initialized, authLoading]);
+
+  // Refresh notifications when panel opens (if needed)
+  useEffect(() => {
+    if (isOpen && initialized && user && user._id && !authLoading) {
+      // Only refresh if notifications are stale (older than 10 seconds)
+      const now = Date.now();
+      const shouldRefresh = !lastFetchTime || (now - lastFetchTime > 10000);
+      
+      if (shouldRefresh) {
+        fetchNotifications();
+      }
+    }
+  }, [isOpen]);
 
   // Fetch unread count on component mount and set up socket listener
   useEffect(() => {
     if (initialized && user && user._id && !authLoading) {
       fetchUnreadCount();
+      
+      // Refresh unread count every 30 seconds
+      const unreadCountInterval = setInterval(() => {
+        fetchUnreadCount();
+      }, 30000);
       
       // Listen for new notifications via socket
       const socket = getSocket();
@@ -39,10 +59,8 @@ const NotificationCenter = () => {
           // Refresh unread count when new notification arrives
           fetchUnreadCount();
           
-          // If notification center is open, refresh the list
-          if (isOpen) {
-            fetchNotifications();
-          }
+          // Refresh notifications list in background
+          fetchNotifications();
         };
 
         // Listen for various notification events
@@ -51,13 +69,18 @@ const NotificationCenter = () => {
         socket.on('receiveAppointmentInvitation', handleNewNotification);
         
         return () => {
+          clearInterval(unreadCountInterval);
           socket.off('receiveMessage', handleNewNotification);
           socket.off('receiveMeetingInvitation', handleNewNotification);
           socket.off('receiveAppointmentInvitation', handleNewNotification);
         };
       }
+      
+      return () => {
+        clearInterval(unreadCountInterval);
+      };
     }
-  }, [user, isOpen, initialized, authLoading]);
+  }, [user, initialized, authLoading]);
 
   const fetchNotifications = async (page = 1, append = false) => {
     try {
@@ -66,7 +89,11 @@ const NotificationCenter = () => {
         return;
       }
       
-      setLoading(true);
+      // Only show loading spinner if we don't have any notifications yet
+      if (!append && notifications.length === 0) {
+        setLoading(true);
+      }
+      
       const data = await notificationDb.getUserNotifications({ page, limit: 20 });
       
       if (append) {
@@ -77,6 +104,12 @@ const NotificationCenter = () => {
       
       setHasMore(data.currentPage < data.totalPages);
       setCurrentPage(data.currentPage);
+      setLastFetchTime(Date.now());
+      
+      // Update unread count from the response (backend already provides this)
+      if (data.unreadCount !== undefined) {
+        setUnreadCount(data.unreadCount);
+      }
     } catch (error) {
       // Only show toast for non-authentication errors
       if (error.response?.status !== 401) {
