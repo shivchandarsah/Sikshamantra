@@ -524,10 +524,6 @@ Creates an admin account for platform management.
 
 This project is licensed under the MIT License.
 
-## 👥 Authors
-
-- **Prince Sah** - Full Stack Developer
-- **Shiv Chandar** - Project Mentor
 
 ## 🙏 Acknowledgments
 
